@@ -1,0 +1,95 @@
+"Midterm #2 - Dosse Problem #2" 
+ 
+"Constants/Knowns"
+R = 0.287 [kJ/kg-K]
+ 
+"State 1:"
+P[1] = 100 [kPa]    "given"
+T[1] = 300 [K]        "given"
+v[1] = volume(Air,T=T[1],P=P[1])
+u[1] = intenergy(Air,T=T[1])
+s[1] = entropy(Air,T=T[1],P=P[1])
+ 
+"Process 1 to 2 - Isochoric:"
+"n_12 is infinity"     "given"
+ 
+"State 2:"
+v[2] = v[1]
+T[2] = T[3]
+P[2] = pressure(Air,T=T[2],v=v[2])
+u[2] = intenergy(Air,T=T[2])
+s[2] = entropy(Air,T=T[2],P=P[2])
+ 
+"Process 2 to 3 - Isothermal:"
+n_23 = 1     "given"
+ 
+"State 3:"
+T[3] = 450 [K]     "given" 
+P[3] = P[4]*(P_r3/P_r4)     "Calculated using Table A7.2, temperature dependent isentropic process for an ideal gas"
+v[3] = volume(Air,T=T[3],P=P[3])
+u[3] = intenergy(Air,T=T[3])
+s[3] = entropy(Air,T=T[3],P=P[3])
+ 
+"Process 3 to 4 - isentropic - non constant specific heat"
+P_r3 = 4.65625     "Table A7.2"
+P_r4 = 2.51055     "Table A7.2"
+n_34 = ln(P[3]/P[4])/ln(v[4]/v[3]) 
+ 
+"State 4"
+P[4] = 400 [kPa]     "given"
+v[4] = v[1]*((P[1]/P[4])^(1/n_41))
+T[4] = temperature(Air,P=P[4],v=v[4])
+u[4] = intenergy(Air,T=T[4])
+s[4] = entropy(Air,T=T[4],P=P[4])
+ 
+"Process 4 to 1 - polytropic process"
+n_41 = 1.2     "given"
+ 
+"Calculate the change in entropy for each process:"
+s_12 = s[2] - s[1]
+s_23 = s[3] - s[2]
+s_34 = s[4] - s[3]
+s_41 = s[1] - s[4]
+ 
+"Given from the problem"
+S_31 = -1 [kJ/K]
+ 
+"Calculate the mass:"
+m = S_31/(s[3] - s[1])
+ 
+"Calculate the volumes:"
+Volume[1] = m*v[1]
+Volume[2] = m*v[2]
+Volume[3] = m*v[3]
+Volume[4] = m*v[4]
+ 
+"Calculate the work and heat transfer for each process:"
+W_12 = 0 [kJ]     "isochoric process"
+Q_12 = m*(u[2] - u[1])
+ 
+W_23 = P[2]*m*v[2]*ln(v[3]/v[2])
+Q_23 = m*(u[3] - u[2]) + W_23
+ 
+"Check on work and heat transfer:
+W_23_idealgas = m*R*T[2]*ln(P[2]/P[3])
+Q_23_rev = m*T[2]*s_23
+W_23_coe = Q_23_rev + m*(u[2] - u[3])"
+ 
+W_34 = m*(P[4]*v[4] - P[3]*v[3])/(1 - n_34)
+Q_34 = 0 [kJ]     "isentropic process - no heat transfer"
+ 
+"Check on work and heat transfer
+W_34_idealgas = m*R*(T[4] - T[3])/(1 - n_34)
+W_34_k = m*(P[4]*v[4] - P[3]*v[3])/(1 - 1.4)    check wrong k value
+Q_34_coe = m*(u[4] - u[3]) + W_34
+W_34_coe = Q_34 + m*(u[3] - u[4])"
+ 
+W_41 = m*(P[1]*v[1] - P[4]*v[4])/(1 - n_41)
+Q_41 = m*(u[1] - u[4]) + W_41
+ 
+"Check on work and heat transfer
+W_41_idealgas = m*R*(T[1] - T[4])/(1 - n_41)"
+ 
+"Calculate net work and heat transfer for the cycle - they should be approximately equal"
+W_net = W_12 + W_23 + W_34 + W_41
+Q_net = Q_12 +Q_23 + Q_34 + Q_41
