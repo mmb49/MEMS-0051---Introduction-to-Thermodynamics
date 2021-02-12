@@ -1,0 +1,97 @@
+"EES Solution for Midterm #2 Problem #1"
+ 
+"One of the first things we should do is check the phase of the oxygen in each of the tanks as this will determine our solution methods. While checking that, since we have the initial temperature and pressure of each section, we can determine the remaining state properties."
+ 
+"Oxygen - State 1A"
+T[1] = 75 [K]
+P[1] = 3000 [kPa]
+P$[1] = phase$(Oxygen,T=T[1],P=P[1])
+u[1] = intenergy(Oxygen,T=T[1],P=P[1])
+h[1] = enthalpy(Oxygen,T=T[1],P=P[1])
+s[1] = entropy(Oxygen,T=T[1],P=P[1])
+v[1] = volume(Oxygen,T=T[1],P=P[1])
+cp[1] = cp(Oxygen,T=T[1],P=P[1])
+cv[1] = cv(Oxygen,T=T[1],P=P[1])
+m[1] = 1 [kg]
+ 
+"Oxygen - State 1B"
+T[2] = 125 [K]
+P[2] = 3000 [kPa]
+P$[2] = phase$(Oxygen,T=T[2],P=P[2])
+u[2] = intenergy(Oxygen,T=T[2],P=P[2])
+h[2] = enthalpy(Oxygen,T=T[2],P=P[2])
+s[2] = entropy(Oxygen,T=T[2],P=P[2])
+v[2] = volume(Oxygen,T=T[2],P=P[2])
+cp[2] = cp(Oxygen,T=T[2],P=P[2])
+m[2] = 1.5 [kg]
+ 
+"We note that the oxygen is a compressed/subcooled liquid in both tanks at the intial state. We have two solution paths to follow then. We can either assume the tanks are completely rigid, or we can recall that liquids do not compress well and assume that the tanks must have some volume change. It is important to note here that even very small volume changes will drastically reduce or increase the pressure of the liquid oxygen. If we check the pressures found for the oxygen assuming constant volume, we will find that the change in pressure is extremely large, and thus the tanks in real life will have some volume change. Since both oxygen tanks will remain as compressed liquids, changes in pressure will have a very minimal effect on state properties (recall temperature was what we were concerned often with when using the steam tables). For solution #1, let us assume the pressure is approximately constant (as noted it is fairly inconsequential)."
+ 
+ 
+"Since we know the pressure, we can find the equilibrium temperature by using the Conservation of Energy and solving for the final enthalpy. If our CV is around both sections inside the tank, then there is no heat transfer or work performed during the process."
+ 
+"Equilibrium Temperature using Enthalpy - both sections same temperature and pressure."
+P[3] = P[2]
+h[3] = (m[1]*h[1] + m[2]*h[2])/(m[1] + m[2])
+T[3] = temperature(Oxygen,P=P[3],h=h[3])   "Equilibrium temperature"
+P$[3] = phase$(Oxygen,P=P[3],h=h[3])      "Note that the oxygen is still a liquid"
+cp[3] = cp(Oxygen,P=P[3],h=h[3])    "Specific heat at equilibrium temperature"
+s[3] = entropy(Oxygen,P=P[3],h=h[3]) 
+v[3] = volume(Oxygen,P=P[3],h=h[3])
+ 
+"For plotting purposes, it is sufficiently accurate to simply take an average specific heat for each section."
+ 
+"Calculate average specific heat for sections A and B."
+cp_avg_A = (cp[3] + cp[1])/2
+cp_avg_B = (cp[3] + cp[2])/2
+ 
+ 
+"Now, we need to find the total entropy generated for the process. Note that due to differences in specific heat values and rounding errors, Matlab will likely give a slightly different answer than that found using EES. Either answer is acceptable though. We can use the 2nd Law to determine the entropy generated during the process. Again, if our CV is around both sections inside the tank, then we know that there is no heat transfer, and so the change in entropy from state 1 to 2 is equal to the entropy generated."
+ 
+"Calculate entropy generated"
+ sigma_1 = (m[1]*s[3] + m[2]*s[3]) - (m[1]*s[1] + m[2]*s[2])
+ 
+"For solution #2, let us now assume each section within the tank is completely rigid and has a constant volume. We know the final specific volume of each state for the two sections, but we do not have another property. We do know from the Conservation of energy, however, that U_2 must be equal to U_1 if our CV is around both sections inside the tank, as then there is no heat transfer or work performed during the process."
+ 
+"Oxygen - State 2A"
+v[4] = v[1]
+T[4] = 111.1 [K]   "we need to iterate this to find the equilibrium temperature."
+P[4] = pressure(Oxygen,T=T[4],v=v[4])
+P$[4] = phase$(Oxygen,T=T[4],v=v[4])
+x[4] = quality(Oxygen,T=T[4],v=v[4])
+u[4] = intenergy(Oxygen,T=T[4],v=v[4])
+h[4] = enthalpy(Oxygen,T=T[4],v=v[4])
+s[4] = entropy(Oxygen,T=T[4],v=v[4])
+cv[4] = cv(Oxygen,T=T[4],v=v[4])
+ 
+"Oxygen - State 2B"
+v[5] = v[2]
+T[5] = T[4]
+P[5] = pressure(Oxygen,T=T[5],v=v[5])
+P$[5] = phase$(Oxygen,T=T[5],v=v[5])
+x[5] = quality(Oxygen,T=T[5],v=v[5])
+u[5] = intenergy(Oxygen,T=T[5],v=v[5])
+h[5] = enthalpy(Oxygen,T=T[5],v=v[5])
+s[5] = entropy(Oxygen,T=T[5],v=v[5])
+ 
+"Find temperature in which U_2 - U_1 = 0 [kJ]. When this is equal to zero, we found the equilibrium temperature."
+U_2 = m[1]*u[4] + m[2]*u[5]
+U_1 = m[1]*u[1] + m[2]*u[2]
+Delta_U = U_2 - U_1
+ 
+"For plotting purposes, find the average specific heat through the process."
+Cv_avg = (cv[4] + cv[1])/2
+ 
+"Despite the fact that section B starts to undergo a phase change, for plotting purposes, it is sufficient to create an equivalent specific heat. This can be done by rearranging the 1st law and solving for the specific heat."
+Cv_eq = (m[1]*Cv_avg*(T[5] - T[1]))/(m[2]*(T[2] - T[5]))
+ 
+"Equilibrium Temperature using Internal Energy"
+T[6] = T[5]   "Equilibrium temperature"
+cv[6] = cv[4]   "Specific heat at equilibrium temperature"
+ 
+"cv[6] is the specific heat of oxygen at equilibrium temperature and pressure of section A. Be careful as there really is not a specific heat for the oxygen in section B as it is now a saturated   mixture."
+ 
+"Note that due to differences in specific heat values and rounding errors, Matlab will likely give a slightly different answer than that found using EES. Either answer is acceptable though. We can use the 2nd Law to determine the entropy generated during the process. Again, if our CV is around both sections inside the tank, then we know that there is no heat transfer, and so the change in entropy from state 1 to 2 is equal to the entropy generated."
+ 
+"Calculate entropy generated."
+sigma_2 = (m[1]*s[4] + m[2]*s[5]) - (m[1]*s[1] + m[2]*s[2])
